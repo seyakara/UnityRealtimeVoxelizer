@@ -17,15 +17,15 @@ namespace UnityRealtimeVoxelizer
     public class Voxelizer : MonoBehaviour
     {
         public Mesh m_mesh;
-        public Material m_material;
-
         public Vector3 m_centerPos;
         public float m_areaSize;
         public int m_gridWidth = 96;
         public Transform m_targetPos;
         public float m_heightScale = 1.0f;
         public float m_FPS;
-        public ComputeShader m_computShader;
+
+        [HideInInspector] public ComputeShader m_computShader;
+        [HideInInspector] public Material m_material;
 
         int m_kernel_reset;
         int m_kernel_makelist;
