@@ -1,5 +1,5 @@
 # UnityRealtimeVoxelizer
-![20211219_005035_Moment2](https://user-images.githubusercontent.com/8469918/146647348-4952824c-7580-4374-be3c-d198507f4ca9.jpg)  
+![20211219_005035_Moment3](https://user-images.githubusercontent.com/8469918/146648770-a5ee3a10-4e2c-4123-8aab-47e746e47845.jpg)  
 Unity上で任意の3Dモデルをリアルタイムでボクセル化して描画できるシェーダーです。    
 元のモデルのテクスチャおよびベースカラーをボクセル色に反映させることができます。  
 また上記画像のようにボクセルを別のメッシュに置き換えて描画させることも可能です。
