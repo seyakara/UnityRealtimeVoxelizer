@@ -24,8 +24,8 @@ namespace UnityRealtimeVoxelizer
         public float m_heightScale = 1.0f;
         public float m_FPS;
 
-        [HideInInspector] public ComputeShader m_computShader;
-        [HideInInspector] public Material m_material;
+        public ComputeShader m_computShader;
+        public Material m_material;
 
         int m_kernel_reset;
         int m_kernel_makelist;
