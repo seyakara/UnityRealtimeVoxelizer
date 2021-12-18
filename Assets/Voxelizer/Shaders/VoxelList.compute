@@ -1,0 +1,52 @@
+#pragma kernel ResetList
+#pragma kernel MakeList
+
+struct VoxelData
+{
+	float3 position;
+	float4 color;
+};
+
+RWStructuredBuffer<uint> _ColorBuffer;
+RWStructuredBuffer<VoxelData> _ResultBuffer;
+int _GridWidth;
+float3 _BasePos;
+float _BlockSize;
+float _HeightScale;
+
+[numthreads(8,8,8)]
+void ResetList(uint3 id : SV_DispatchThreadID)
+{
+	uint grididx = id.z * _GridWidth * _GridWidth + id.y * _GridWidth + id.x;
+
+	_ColorBuffer[grididx] = 0;
+}
+
+
+[numthreads(8, 8, 8)]
+void MakeList(uint3 id : SV_DispatchThreadID)
+{
+	uint grididx = id.z * _GridWidth * _GridWidth + id.y * _GridWidth + id.x;
+
+	uint encodedcolor = _ColorBuffer[grididx];
+
+	if ((encodedcolor & 0xFF000000) > 0) {
+		float4 color;
+		color.r = (encodedcolor >> 16u) & 0x000000ff;
+		color.g = (encodedcolor >> 8u) & 0x000000ff;
+		color.b = (encodedcolor) & 0x000000ff;
+		color.a = 255.0;
+		color /= 255.0;
+
+		uint orgidx = _ResultBuffer.IncrementCounter();
+
+		float3 gridIdx = id;
+		VoxelData data;
+		data.position = _BasePos + gridIdx * float3(_BlockSize, _BlockSize*_HeightScale, _BlockSize);
+		data.color = color;
+
+		_ResultBuffer[orgidx] = data;
+		_ColorBuffer[grididx] = 0;
+	}
+}
+
