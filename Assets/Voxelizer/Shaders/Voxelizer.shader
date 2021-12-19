@@ -65,7 +65,7 @@
 			{
 				VoxelAttributes output = input;
 				output.vertex = mul(unity_ObjectToWorld, input.vertex);
-				output.normal = TransformObjectToWorldNormal(input.normal);
+				output.normal = mul((float3x3)UNITY_MATRIX_MV, input.normal);
 				output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
 				return output;
 			}
