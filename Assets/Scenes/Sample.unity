@@ -1417,7 +1417,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!84 &1567105406
+--- !u!84 &1627372065
 RenderTexture:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1431,8 +1431,8 @@ RenderTexture:
   m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
   serializedVersion: 5
-  m_Width: 256
-  m_Height: 256
+  m_Width: 128
+  m_Height: 128
   m_AntiAliasing: 8
   m_MipCount: -1
   m_DepthStencilFormat: 0
@@ -1576,37 +1576,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5159359988104761415, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.9375
-      objectReference: {fileID: 0}
-    - target: {fileID: 5159359988104761415, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5159359988104761418, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
-      propertyPath: far clip plane
-      value: 7
-      objectReference: {fileID: 0}
     - target: {fileID: 5159359988104761418, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
       propertyPath: m_TargetTexture
       value: 
-      objectReference: {fileID: 1567105406}
-    - target: {fileID: 5159359988104761418, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
-      propertyPath: orthographic size
-      value: 3
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1627372065}
     - target: {fileID: 5159359988107574309, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
       propertyPath: m_Name
       value: Voxelizer
-      objectReference: {fileID: 0}
-    - target: {fileID: 5159359988107574314, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
-      propertyPath: m_gridWidth
-      value: 256
-      objectReference: {fileID: 0}
-    - target: {fileID: 5159359988107574314, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
-      propertyPath: m_centerPos.y
-      value: 0.9375
       objectReference: {fileID: 0}
     - target: {fileID: 5159359988107574315, guid: ae0c3fd8c5408c041bbb50b683dba679, type: 3}
       propertyPath: m_RootOrder

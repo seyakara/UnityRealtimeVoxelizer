@@ -16,10 +16,11 @@ namespace UnityRealtimeVoxelizer
     [ExecuteAlways]
     public class Voxelizer : MonoBehaviour
     {
+        public LayerMask m_targetLayer;
         public Mesh m_mesh;
         public Vector3 m_centerPos;
         public float m_areaSize;
-        public int m_gridWidth = 96;
+        public int m_gridWidth = 128;
         public Transform m_targetPos;
         public float m_heightScale = 1.0f;
         public float m_FPS;
@@ -77,34 +78,13 @@ namespace UnityRealtimeVoxelizer
 
             m_voxelCamera = GetComponentInChildren<Camera>();
             m_voxelCamera.targetTexture = m_renderTexture;
-
-            int buffsize = m_gridWidth * m_gridWidth * m_gridWidth;
-            m_voxelBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Counter, buffsize, Marshal.SizeOf(typeof(VoxelData)));
-            m_voxelBuffer.SetCounterValue(0);
-            m_material.SetBuffer("_VoxelBuffer", m_voxelBuffer);
-
-            m_argsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, 5, Marshal.SizeOf(typeof(uint)));
-            uint[] args = new uint[] { 0, 0, 0, 0, 0 };
-            args[0] = m_mesh.GetIndexCount(0);
-            args[1] = 0;
-            args[2] = m_mesh.GetIndexStart(0);
-            args[3] = m_mesh.GetBaseVertex(0);
-            m_argsBuffer.SetData(args);
-
-            m_colorBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, buffsize, Marshal.SizeOf(typeof(uint)));
+            m_voxelCamera.cullingMask = m_targetLayer;
 
             m_kernel_reset = m_computShader.FindKernel("ResetList");
-            m_computShader.SetBuffer(m_kernel_reset, "_ColorBuffer", m_colorBuffer);
-
             m_kernel_makelist = m_computShader.FindKernel("MakeList");
-            m_computShader.SetBuffer(m_kernel_makelist, "_ColorBuffer", m_colorBuffer);
-            m_computShader.SetBuffer(m_kernel_makelist, "_ResultBuffer", m_voxelBuffer);
 
+            CreateBuffers();
             UpdateVoxelCamera();
-
-            uint x, y, z;
-            m_computShader.GetKernelThreadGroupSizes(m_kernel_reset, out x, out y, out z);
-            m_computShader.Dispatch(m_kernel_reset, m_gridWidth / (int)x, m_gridWidth / (int)y, m_gridWidth / (int)z);
         }
 
         private void LateUpdate()
@@ -157,15 +137,15 @@ namespace UnityRealtimeVoxelizer
             float blocksize = m_voxelCamera.orthographicSize / (float)m_gridWidth * 2.0f;
             Vector3 VoxelUnitSize = new Vector3(blocksize, blocksize * m_heightScale, blocksize);
 
-            m_centerPos = new Vector3(VoxelUnitSize.x * (int)(m_centerPos.x / VoxelUnitSize.x),
+            Vector3 campos = new Vector3(VoxelUnitSize.x * (int)(m_centerPos.x / VoxelUnitSize.x),
                                             VoxelUnitSize.y * (int)(m_centerPos.y / VoxelUnitSize.y),
                                             VoxelUnitSize.z * (int)(m_centerPos.z / VoxelUnitSize.z));
 
-            m_voxelCamera.transform.position = m_centerPos - new Vector3(0, 0, m_areaSize + m_voxelCamera.nearClipPlane);
+            m_voxelCamera.transform.position = campos - new Vector3(0, 0, m_areaSize + m_voxelCamera.nearClipPlane);
             m_voxelCamera.farClipPlane = m_voxelCamera.nearClipPlane + m_areaSize * 2.0f;
 
 
-            Vector3 VoxelBasePos = m_centerPos - VoxelUnitSize * (m_gridWidth / 2);
+            Vector3 VoxelBasePos = campos - VoxelUnitSize * (m_gridWidth / 2);
 
             Shader.SetGlobalFloat("_BlockSize", blocksize);
             Shader.SetGlobalFloat("_HeightScale", m_heightScale);
@@ -178,6 +158,45 @@ namespace UnityRealtimeVoxelizer
             m_computShader.SetInt("_GridWidth", m_gridWidth);
             m_computShader.SetFloat("_BlockSize", blocksize);
             m_computShader.SetFloat("_HeightScale", m_heightScale);
+        }
+
+        private void CreateBuffers()
+        {
+            if (m_gridWidth > 0)
+            {
+                m_argsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, 5, Marshal.SizeOf(typeof(uint)));
+                uint[] args = new uint[] { 0, 0, 0, 0, 0 };
+                args[0] = m_mesh.GetIndexCount(0);
+                args[1] = 0;
+                args[2] = m_mesh.GetIndexStart(0);
+                args[3] = m_mesh.GetBaseVertex(0);
+                m_argsBuffer.SetData(args);
+
+                int buffsize = m_gridWidth * m_gridWidth * m_gridWidth;
+                m_voxelBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Counter, buffsize, Marshal.SizeOf(typeof(VoxelData)));
+                m_voxelBuffer.SetCounterValue(0);
+                m_material.SetBuffer("_VoxelBuffer", m_voxelBuffer);
+
+                m_colorBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, buffsize, Marshal.SizeOf(typeof(uint)));
+                m_computShader.SetBuffer(m_kernel_reset, "_ColorBuffer", m_colorBuffer);
+
+                m_computShader.SetBuffer(m_kernel_makelist, "_ColorBuffer", m_colorBuffer);
+                m_computShader.SetBuffer(m_kernel_makelist, "_ResultBuffer", m_voxelBuffer);
+
+                uint x, y, z;
+                m_computShader.GetKernelThreadGroupSizes(m_kernel_reset, out x, out y, out z);
+                m_computShader.Dispatch(m_kernel_reset, m_gridWidth / (int)x, m_gridWidth / (int)y, m_gridWidth / (int)z);
+            }
+        }
+
+        private void OnValidate()
+        {
+            if (m_voxelCamera != null)
+            {
+                m_voxelCamera.cullingMask = m_targetLayer;
+                UpdateVoxelCamera();
+            }
+
         }
     }
 }

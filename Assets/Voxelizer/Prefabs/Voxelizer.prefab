@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5159359988104761414}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.984375, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -57,10 +57,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 1
-  far clip plane: 6
+  far clip plane: 7
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -154,8 +154,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07d311d9f310d5342bf1b090d67c975a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
   m_mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  m_material: {fileID: 2100000, guid: faa8caf43e17ea64d864ff14e47e1388, type: 2}
   m_centerPos: {x: 0, y: 1, z: 0}
   m_areaSize: 3
   m_gridWidth: 128
@@ -163,3 +165,4 @@ MonoBehaviour:
   m_heightScale: 1
   m_FPS: 0
   m_computShader: {fileID: 7200000, guid: aba9f3a7d64836e44934a402704e1e64, type: 3}
+  m_material: {fileID: 2100000, guid: faa8caf43e17ea64d864ff14e47e1388, type: 2}
