@@ -35,6 +35,7 @@ namespace UnityRealtimeVoxelizer
         GraphicsBuffer m_colorBuffer;
         GraphicsBuffer m_argsBuffer;
         Camera m_voxelCamera;
+        int m_prevgridWidth = 0;
 
         float m_lastRenderedTime;
 
@@ -70,20 +71,8 @@ namespace UnityRealtimeVoxelizer
 
             m_lastRenderedTime = 0f;
 
-            m_renderTexture = new RenderTexture(m_gridWidth, m_gridWidth, 0, RenderTextureFormat.ARGB32);
-            m_renderTexture.filterMode = FilterMode.Point;
-            m_renderTexture.antiAliasing = 8;
-            m_renderTexture.useMipMap = false;
-            m_renderTexture.Create();
+            Setup();
 
-            m_voxelCamera = GetComponentInChildren<Camera>();
-            m_voxelCamera.targetTexture = m_renderTexture;
-            m_voxelCamera.cullingMask = m_targetLayer;
-
-            m_kernel_reset = m_computShader.FindKernel("ResetList");
-            m_kernel_makelist = m_computShader.FindKernel("MakeList");
-
-            CreateBuffers();
             UpdateVoxelCamera();
         }
 
@@ -115,20 +104,7 @@ namespace UnityRealtimeVoxelizer
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
 
-            if (m_voxelBuffer != null)
-            {
-                m_voxelBuffer.Release();
-            }
-
-            if (m_colorBuffer != null)
-            {
-                m_colorBuffer.Release();
-            }
-
-            if (m_argsBuffer != null)
-            {
-                m_argsBuffer.Release();
-            }
+            ReleaseBuffers();
         }
 
         private void UpdateVoxelCamera()
@@ -160,43 +136,84 @@ namespace UnityRealtimeVoxelizer
             m_computShader.SetFloat("_HeightScale", m_heightScale);
         }
 
-        private void CreateBuffers()
+        private void Setup()
         {
-            if (m_gridWidth > 0)
+            ReleaseBuffers();
+
+            if (m_renderTexture != null)
             {
-                m_argsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, 5, Marshal.SizeOf(typeof(uint)));
-                uint[] args = new uint[] { 0, 0, 0, 0, 0 };
-                args[0] = m_mesh.GetIndexCount(0);
-                args[1] = 0;
-                args[2] = m_mesh.GetIndexStart(0);
-                args[3] = m_mesh.GetBaseVertex(0);
-                m_argsBuffer.SetData(args);
+                m_renderTexture.Release();
+            }
+            m_renderTexture = new RenderTexture(m_gridWidth, m_gridWidth, 0, RenderTextureFormat.ARGB32);
+            m_renderTexture.filterMode = FilterMode.Point;
+            m_renderTexture.antiAliasing = 8;
+            m_renderTexture.useMipMap = false;
+            m_renderTexture.Create(); 
 
-                int buffsize = m_gridWidth * m_gridWidth * m_gridWidth;
-                m_voxelBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Counter, buffsize, Marshal.SizeOf(typeof(VoxelData)));
-                m_voxelBuffer.SetCounterValue(0);
-                m_material.SetBuffer("_VoxelBuffer", m_voxelBuffer);
+            m_voxelCamera = GetComponentInChildren<Camera>();
+            m_voxelCamera.cullingMask = m_targetLayer;
+            m_voxelCamera.targetTexture = m_renderTexture;
 
-                m_colorBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, buffsize, Marshal.SizeOf(typeof(uint)));
-                m_computShader.SetBuffer(m_kernel_reset, "_ColorBuffer", m_colorBuffer);
+            m_kernel_reset = m_computShader.FindKernel("ResetList");
+            m_kernel_makelist = m_computShader.FindKernel("MakeList");
 
-                m_computShader.SetBuffer(m_kernel_makelist, "_ColorBuffer", m_colorBuffer);
-                m_computShader.SetBuffer(m_kernel_makelist, "_ResultBuffer", m_voxelBuffer);
+            m_argsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, 5, Marshal.SizeOf(typeof(uint)));
+            uint[] args = new uint[] { 0, 0, 0, 0, 0 };
+            args[0] = m_mesh.GetIndexCount(0);
+            args[1] = 0;
+            args[2] = m_mesh.GetIndexStart(0);
+            args[3] = m_mesh.GetBaseVertex(0);
+            m_argsBuffer.SetData(args);
 
-                uint x, y, z;
-                m_computShader.GetKernelThreadGroupSizes(m_kernel_reset, out x, out y, out z);
-                m_computShader.Dispatch(m_kernel_reset, m_gridWidth / (int)x, m_gridWidth / (int)y, m_gridWidth / (int)z);
+            int buffsize = m_gridWidth * m_gridWidth * m_gridWidth;
+            m_voxelBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Counter, buffsize, Marshal.SizeOf(typeof(VoxelData)));
+            m_voxelBuffer.SetCounterValue(0);
+            m_material.SetBuffer("_VoxelBuffer", m_voxelBuffer);
+
+            m_colorBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, buffsize, Marshal.SizeOf(typeof(uint)));
+            m_computShader.SetBuffer(m_kernel_reset, "_ColorBuffer", m_colorBuffer);
+
+            m_computShader.SetBuffer(m_kernel_makelist, "_ColorBuffer", m_colorBuffer);
+            m_computShader.SetBuffer(m_kernel_makelist, "_ResultBuffer", m_voxelBuffer);
+
+            uint x, y, z;
+            m_computShader.GetKernelThreadGroupSizes(m_kernel_reset, out x, out y, out z);
+            m_computShader.Dispatch(m_kernel_reset, m_gridWidth / (int)x, m_gridWidth / (int)y, m_gridWidth / (int)z);
+        }
+
+        private void ReleaseBuffers()
+        {
+            if (m_voxelBuffer != null)
+            {
+                m_voxelBuffer.Release();
+            }
+
+            if (m_colorBuffer != null)
+            {
+                m_colorBuffer.Release();
+            }
+
+            if (m_argsBuffer != null)
+            {
+                m_argsBuffer.Release();
             }
         }
 
         private void OnValidate()
         {
-            if (m_voxelCamera != null)
+            if (m_prevgridWidth != m_gridWidth)
+            {
+                m_gridWidth = Mathf.Max(8, m_gridWidth);
+
+                Setup();
+                m_prevgridWidth = m_gridWidth;
+            }
+
+            if(m_voxelCamera != null)
             {
                 m_voxelCamera.cullingMask = m_targetLayer;
                 UpdateVoxelCamera();
             }
-
         }
     }
 }

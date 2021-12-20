@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5159359988104761414}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.984375, z: -4}
+  m_LocalPosition: {x: 0, y: 1, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40,7 +40,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5159359988104761414}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 2
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
@@ -57,10 +57,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 1
-  far clip plane: 7
+  far clip plane: 3
   field of view: 60
   orthographic: 1
-  orthographic size: 3
+  orthographic size: 1
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -159,7 +159,7 @@ MonoBehaviour:
     m_Bits: 64
   m_mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   m_centerPos: {x: 0, y: 1, z: 0}
-  m_areaSize: 3
+  m_areaSize: 1
   m_gridWidth: 128
   m_targetPos: {fileID: 0}
   m_heightScale: 1
