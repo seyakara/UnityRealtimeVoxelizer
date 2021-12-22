@@ -47,6 +47,10 @@ namespace UnityRealtimeVoxelizer
             {
                 Graphics.SetRandomWriteTarget(1, m_colorBuffer, false);
             }
+            else
+            {
+                Graphics.DrawMeshInstancedIndirect(m_mesh, 0, m_material, new Bounds(Vector3.zero, new Vector3(100.0f, 100.0f, 100.0f)), m_argsBuffer);
+            }
         }
 
         void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
@@ -76,8 +80,9 @@ namespace UnityRealtimeVoxelizer
             UpdateVoxelCamera();
         }
 
-        private void LateUpdate()
+        private void Update()
         {
+            // FPS§Œä
             float current = Time.time;
             float frameInterval = m_FPS > 0f ? 1.0f / m_FPS : 0f;
             if (current - m_lastRenderedTime >= frameInterval)
@@ -95,8 +100,6 @@ namespace UnityRealtimeVoxelizer
             {
                 m_voxelCamera.enabled = false;
             }
-
-            Graphics.DrawMeshInstancedIndirect(m_mesh, 0, m_material, new Bounds(Vector3.zero, new Vector3(100.0f, 100.0f, 100.0f)), m_argsBuffer);
         }
 
         private void OnDisable()

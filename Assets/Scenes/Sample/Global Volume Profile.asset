@@ -111,13 +111,13 @@ MonoBehaviour:
   active: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 0.9
+    m_Value: 0.85
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 1.87
   scatter:
     m_OverrideState: 1
-    m_Value: 0.356
+    m_Value: 0.43
   clamp:
     m_OverrideState: 0
     m_Value: 65472
@@ -157,7 +157,7 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.393
+    m_Value: 0.4
   smoothness:
     m_OverrideState: 1
     m_Value: 0.2
@@ -179,7 +179,7 @@ MonoBehaviour:
   active: 1
   postExposure:
     m_OverrideState: 1
-    m_Value: 0.54
+    m_Value: 0.5
   contrast:
     m_OverrideState: 0
     m_Value: 0
@@ -191,4 +191,4 @@ MonoBehaviour:
     m_Value: 0
   saturation:
     m_OverrideState: 1
-    m_Value: 33.3
+    m_Value: 33.25
